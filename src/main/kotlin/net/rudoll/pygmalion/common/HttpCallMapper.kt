@@ -24,6 +24,7 @@ object HttpCallMapper {
 
     fun map(method: String, route: String, parsedInput: ParsedInput, resultCallback: ResultCallback) {
         PortManager.ensurePortIsSet(parsedInput)
+        SecureManager.ensureSecureIsHandled(parsedInput)
         val requestHandler = { request: Request, response: Response -> handleCall(request, response, parsedInput, resultCallback) }
         parsedInput.logs.add("Mapping route $route for method $method")
         when (method.toLowerCase()) {

@@ -8,7 +8,7 @@ object SecureManager {
 
     fun secure(on: Boolean) {
         if (on) {
-            Spark.secure("keystore.jks","keystore", "keystore.jks", "keystore")
+            Spark.secure("pygmalion.jks","pygmalion", "pygmalion.jks", "pygmalion")
         }
         StateHolder.state.secureSet = true
     }

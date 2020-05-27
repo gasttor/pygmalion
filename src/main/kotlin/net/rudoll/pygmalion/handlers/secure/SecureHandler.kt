@@ -1,6 +1,5 @@
 package net.rudoll.pygmalion.handlers.secure
 
-import net.rudoll.pygmalion.common.PortManager
 import net.rudoll.pygmalion.common.SecureManager
 import net.rudoll.pygmalion.handlers.Handler
 import net.rudoll.pygmalion.handlers.arguments.parsedarguments.ParsedArgument
@@ -23,13 +22,11 @@ object SecureHandler : Handler {
     override fun handle(input: Input, parsedInput: ParsedInput) {
         input.consume(1)
 
-        val defaultKeystore = !input.hasNext()
+        var secureAction = { SecureManager.secure() }
 
-        var keystoreFile = ""
-        var keystorePassword = ""
-
-        if (!defaultKeystore) {
-            keystoreFile = input.first()
+        if (input.hasNext()) {
+            val keystoreFile = input.first()
+            var keystorePassword = ""
             input.consume(1)
 
             if (!input.hasNext()) {
@@ -39,6 +36,8 @@ object SecureHandler : Handler {
                 keystorePassword = input.first()
                 input.consume(1)
             }
+
+            secureAction = { SecureManager.secure(keystoreFile, keystorePassword) }
         }
 
         parsedInput.actions.add(object : Action {
@@ -47,12 +46,9 @@ object SecureHandler : Handler {
                     parsedInput.errors.add("Secure cannot be changed. Please use another instance of this application.")
                     return
                 }
-                if (defaultKeystore) {
-                    SecureManager.secure()
-                } else {
-                    SecureManager.secure(keystoreFile, keystorePassword)
-                }
+                secureAction()
             }
         })
-     }
+    }
+
 }

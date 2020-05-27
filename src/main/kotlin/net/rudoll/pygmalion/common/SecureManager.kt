@@ -6,17 +6,14 @@ import spark.Spark
 
 object SecureManager {
 
-    fun secure(on: Boolean) {
-        if (on) {
-            Spark.secure("pygmalion.jks","pygmalion", "pygmalion.jks", "pygmalion")
-        }
+    fun secure(keystoreFile: String =  "pygmalion.jks", keystorePassword: String = "pygmalion") {
+        Spark.secure(keystoreFile, keystorePassword, keystoreFile, keystorePassword)
         StateHolder.state.secureSet = true
     }
 
     fun ensureSecureIsHandled(parsedInput: ParsedInput) {
         if (!StateHolder.state.secureSet) {
-            parsedInput.logs.add("Setting secure default to false")
-            SecureManager.secure(false)
+            parsedInput.logs.add("Secure will be deactivated as default")
         }
     }
 }

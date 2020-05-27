@@ -13,7 +13,7 @@ object SecureHandler : Handler {
     }
 
     override fun getDocumentation(): String {
-        return "secure \$on/off"
+        return "secure [\$keystoreFile] [\$keystorePassword]"
     }
 
     override fun canHandle(input: Input): Boolean {
@@ -22,24 +22,23 @@ object SecureHandler : Handler {
 
     override fun handle(input: Input, parsedInput: ParsedInput) {
         input.consume(1)
-        if (!input.hasNext()) {
-            parsedInput.errors.add("Select on or off.")
-            return
-        }
 
-        val toggle = input.first()
-        input.consume(1)
+        val defaultKeystore = !input.hasNext()
 
-        parsedInput.actions.add(object : Action {
-            override fun run(arguments: Set<ParsedArgument>) {
+        var keystoreFile = ""
+        var keystorePassword = ""
 
+        if (!defaultKeystore) {
+            keystoreFile = input.first()
+            input.consume(1)
+
+            if (!input.hasNext()) {
+                parsedInput.errors.add("keystorePassword is missing.")
+                return
+            } else {
+                keystorePassword = input.first()
+                input.consume(1)
             }
-        })
-
-        val secureOn = when (toggle) {
-            "on" -> true
-            "off" -> false
-            else -> return
         }
 
         parsedInput.actions.add(object : Action {
@@ -48,13 +47,12 @@ object SecureHandler : Handler {
                     parsedInput.errors.add("Secure cannot be changed. Please use another instance of this application.")
                     return
                 }
-                SecureManager.secure(secureOn)
+                if (defaultKeystore) {
+                    SecureManager.secure()
+                } else {
+                    SecureManager.secure(keystoreFile, keystorePassword)
+                }
             }
         })
      }
-
-
-
-
-
 }
